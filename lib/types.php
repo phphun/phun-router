@@ -43,7 +43,7 @@ const file   = 5;
  * @param a type
  * @return bool
  */
-function is_valid($type) {
+function is_valid($type) : bool {
     if (is_array($type)) return count($type) == 1 && is_valid($type[0]);
     if (is_int($type))   return ($type >= 0 && $type <= 5);
     return @preg_match($type, null) !== false;
@@ -117,4 +117,17 @@ function array_checker($callback) {
     };
 
 }
+
+/**
+ * Return a valid function for a type
+ * @param the Type of the function
+ * @param the subject of the function
+ * @param the method
+ * @return a callback for transforming type from string
+ */
+function getCheckerFunction($type, $subject, $method = 'GET') {
+    
+}
+
+
 
