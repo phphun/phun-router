@@ -22,11 +22,24 @@
 
 declare(strict_types=1);
 
-namespace phun;
+/**
+ * Provide Services for Phun
+ * @author Van de Woestyne Xavier <xaviervdw@gmail.com>
+ */
+namespace phun\router;
 
-// Library inclusion
-require_once 'lib/types.php';
-require_once 'lib/service.php';
+/**
+ * Service
+ * Describe a resource of a PHUN application
+ */
+class Service {
 
-echo "yo";
-?>
+    // Attributes
+    protected $uid;
+    protected $method;
+    protected $parameters;
+    protected $extended_parameters;
+    protected $path;
+    protected $mime;
+
+}
