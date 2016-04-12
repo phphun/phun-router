@@ -22,14 +22,19 @@
 
 declare(strict_types=1);
 
-namespace phun;
+/**
+ * Provide Exceptions for Phun
+ * @todo A more comprehensive exception manager
+ * @author Van de Woestyne Xavier <xaviervdw@gmail.com>
+ */
+namespace phun\Exceptions;
 
-// Library inclusion
-require_once 'lib/exceptions.php';
-require_once 'lib/types.php';
-require_once 'lib/service.php';
-
-$t = types\getCheckerFunction(types\file, 'POST');
-
-echo "yo";
-?>
+// Type Exception
+class InvalidType extends \Exception {
+    /**
+     */
+    public function __construct($mess, $code = 0, Exception $previous = null) {
+        $mess = '[InvalidType] ' . $mess;
+        parent::__construct($mess, $code, $previous);
+    }
+}

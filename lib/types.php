@@ -29,6 +29,8 @@ declare(strict_types=1);
  */
 namespace phun\types;
 
+use \phun\Exceptions as E;
+
 // Kind of types
 const free   = 0;
 const string = 0;
@@ -121,12 +123,28 @@ function array_checker($callback) {
 /**
  * Return a valid function for a type
  * @param the Type of the function
- * @param the subject of the function
  * @param the method
  * @return a callback for transforming type from string
  */
-function getCheckerFunction($type, $subject, $method = 'GET') {
-    
+function getCheckerFunction($type, $method = 'get') {
+    $method = strtolower($method);
+    if (!is_valid($type)) throw new E\InvalidType('Unknown type');
+    if ($method != 'post' && $type == file)
+        throw new E\InvalidType('File is only allowed for POST');
+
+    if (is_array($type)) return array_checker(getCheckerFunction($type[0], $method));
+
+    switch($type) {
+    case free:
+    case string: return free_checker();
+    case int:    return int_checker();
+    case float:  return float_checker();
+    case char:   return char_checker();
+    case bool:   return bool_checker();
+    case file:   return file_checker();
+    default:     return regex_checker($type);
+    }
+
 }
 
 
