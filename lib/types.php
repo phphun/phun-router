@@ -125,6 +125,7 @@ function array_checker($callback) {
  * @param the Type of the function
  * @param the method
  * @return a callback for transforming type from string
+ * @throw InvalidType
  */
 function getCheckerFunction($type, $method = 'get') {
     $method = strtolower($method);
@@ -136,16 +137,47 @@ function getCheckerFunction($type, $method = 'get') {
 
     switch($type) {
     case free:
-    case string: return free_checker();
-    case int:    return int_checker();
-    case float:  return float_checker();
-    case char:   return char_checker();
-    case bool:   return bool_checker();
-    case file:   return file_checker();
-    default:     return regex_checker($type);
+    case string : return free_checker();
+    case int    : return int_checker();
+    case float  : return float_checker();
+    case char   : return char_checker();
+    case bool   : return bool_checker();
+    case file   : return file_checker();
+    default     : return regex_checker($type);
     }
 
 }
 
+/**
+ * Convert static (as a string) type representation to a regexp
+ * @param string the static representation
+ * @return A regexp representation
+ * @throw InvalidType
+ */
+function regexStaticType(string $value) : string {
+    $tl_value = trim(strtolower($value));
+    switch($tl_value) {
+    case 'string' : return '.*';
+    case 'int'    : return '[\+\-]?\d+';
+    case 'float'  : return '[\+\-]?\d+\.\d*';
+    case 'bool'   : return 'true|false';
+    case 'char'   : return '.';
+    }
+    if (@preg_match('/'.$value.'/', null) !== false)
+        return $value;
+    throw new E\InvalidType('Unknown type ['. $value .']');
+}
 
+/**
+ * Force String coersion
+ * @param mixed value
+ * @return a string representation of the mixed value
+ */
+function forceString($value) : string {
+    if ($value === true)  return 'true';
+    if ($value === false) return 'false';
+    if ($value === 0)     return '0';
+    if ($value === 1)     return '1';
+    return (string) $value;
+}
 
