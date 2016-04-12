@@ -149,6 +149,17 @@ function getCheckerFunction($type, $method = 'get') {
 }
 
 /**
+ * Get the string representation of a Type
+ * @param mixed the value of an inferable type
+ * @return string the string representation of a type
+ * @todo rewrite Array Inference !
+ */
+function infertypeOf($value) : string {
+    if (is_array($value)) return '[\phun\types\string]';
+
+}
+
+/**
  * Convert static (as a string) type representation to a regexp
  * @param string the static representation
  * @return A regexp representation
@@ -168,6 +179,7 @@ function regexStaticType(string $value) : string {
     throw new E\InvalidType('Unknown type ['. $value .']');
 }
 
+
 /**
  * Force String coersion
  * @param mixed value
@@ -180,4 +192,7 @@ function forceString($value) : string {
     if ($value === 1)     return '1';
     return (string) $value;
 }
+
+
+
 
