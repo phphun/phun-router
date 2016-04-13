@@ -42,5 +42,29 @@ class Service {
     protected $path;
     protected $mime;
 
+    /**
+     * Constructor of service
+     * @param string method
+     * @param string path
+     * @return Instance of service (and record it)
+     */
+    public function __construct(string $method, string $path) {
+        $this->uid = uniqid('service-');
+
+        // Store the service
+        $this->store();
+    }
+
+    /**
+     * Store the service into the services list
+     */
+    protected function store() {
+        self::$services[$this->uid] = $this;
+    }
+
+    // Static content
+    protected static $services = [];
+
+
 
 }

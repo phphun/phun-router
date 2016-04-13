@@ -29,7 +29,6 @@ require_once 'lib/exceptions.php';
 require_once 'lib/types.php';
 require_once 'lib/service.php';
 
-$t = types\getCheckerFunction(types\file, 'POST');
 
 echo "yo";
 ?>
