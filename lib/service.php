@@ -40,7 +40,7 @@ class Service {
     protected $uid;
     protected $method;
     protected $parameters;
-    protected $extended_parameters;
+    protected $extra_parameters;
     protected $path;
     protected $mime;
 
@@ -55,7 +55,7 @@ class Service {
         $this->method = strtolower(trim($method));
         $this->path = $path;
         $this->parameters = [];
-        $this->extended_parameters = [];
+        $this->extra_parameters = [];
         $this->strict = true;
 
         // Store the service
@@ -69,7 +69,7 @@ class Service {
      * @param array raw container
      * @return a trimmed name
      */
-    protected function checkParameter(string $name, int $type, $container) {
+    protected function checkParameter(string $name, $type, $container) {
         $name = trim($name);
         if (array_key_exists($name, $container) && $name != '')
             throw new E\InvalidParameterName($name . ' already exists');
@@ -80,12 +80,27 @@ class Service {
     /**
      * Add a required parameter
      * @param string name of the Parameter
-     * @param int type of the Parameter
+     * @param type of the Parameter
      * @return the instance (for chaining)
      */
-    public function with(string $name, int $type = T\free) {
+    public function with(string $name, $type = T\free) {
         $name = $this->checkParameter($name, $type, $this->parameter);
         $this->parameter[$name] = [
+            $type, T\getCheckerFunction($type, $this->method)
+        ];
+        return $this;
+
+    }
+
+    /**
+     * Add a required extra - parameter
+     * @param string name of the Parameter
+     * @param type of the Parameter
+     * @return the instance (for chaining)
+     */
+    public function withGET(string $name, $type = T\free) {
+        $name = $this->checkParameter($name, $type, $this->extra_parameter);
+        $this->extra_parameter[$name] = [
             $type, T\getCheckerFunction($type, $this->method)
         ];
         return $this;
