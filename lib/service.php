@@ -51,6 +51,7 @@ class Service {
      * @return Instance of service (and record it)
      */
     public function __construct(string $method, string $path) {
+
         $this->uid = uniqid('service-');
         $this->method = strtolower(trim($method));
         $this->path = $path;
@@ -126,7 +127,8 @@ class Service {
         $globals = $env[1];
         return
             $this->validMethod($method) &&
-            $this->validParameters($globals[$this->paramKey()])
+            $this->validParameters($globals[$this->paramKey()]) &&
+            $this->validExtraParameters($globals['get'])
             ;
     }
 
@@ -135,18 +137,20 @@ class Service {
      * @param the string of the method
      * @return bool
      */
-    protected function validMethod(string $method) {
+    protected function validMethod(string $method) : bool {
         return $this->method == $method;
     }
 
     /**
      * Check if the parameters are valids according the URI
+     * @param the container
+     * @param the global arguments
      * @return bool
      */
-    protected function validParameters($arg) {
-        if ($this->strict && (count($arg) != count($this->parameters)))
+    protected function validRawParameters($container, $arg) : bool {
+        if ($this->strict && (count($arg) != count($container)))
             return false;
-        foreach($this->parameters as $key => $value) {
+        foreach($container as $key => $value) {
             $type = $value[0];
             $callback = $value[1];
             if (!array_key_exists($key, $arg)) return false;
@@ -154,6 +158,27 @@ class Service {
         }
         return true;
     }
+
+    /**
+     * Check parameters
+     * @param the global arguments
+     * @return bool
+     */
+    protected function validParameters($arg) : bool {
+        return $this->validRawParameters($this->parameters, $arg);
+    }
+
+    /**
+     * Check extra parameters
+     * @param the global arguments
+     * @return bool
+     */
+    protected function validExtraParameters($arg) : bool {
+        if ($this->method == 'get') return true;
+        return $this->validRawParameters($this->extra_parameters, $arg);
+    }
+
+
 
     /**
      * Store the service into the services list
