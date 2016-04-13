@@ -31,7 +31,7 @@ require_once 'lib/service.php';
 
 $test = new router\Service('get', '');
 $env  = router\Service::computeGlobals();
-$test->with('name')->with('age', types\int);
+$test->with('name')->with('age', types\float);
 
 
 var_dump($env);

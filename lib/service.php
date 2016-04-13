@@ -126,7 +126,7 @@ class Service {
         $globals = $env[1];
         return
             $this->validMethod($method) &&
-            $this->validParameters($globals)
+            $this->validParameters($globals[$this->paramKey()])
             ;
     }
 
@@ -143,7 +143,15 @@ class Service {
      * Check if the parameters are valids according the URI
      * @return bool
      */
-    protected function validParameters() {
+    protected function validParameters($arg) {
+        if ($this->strict && (count($arg) != count($this->parameters)))
+            return false;
+        foreach($this->parameters as $key => $value) {
+            $type = $value[0];
+            $callback = $value[1];
+            if (!array_key_exists($key, $arg)) return false;
+            if (!$callback($arg[$key])) return false;
+        }
         return true;
     }
 
