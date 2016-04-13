@@ -73,7 +73,7 @@ class Service {
         $name = trim($name);
         if (array_key_exists($name, $container) && $name != '')
             throw new E\InvalidParameterName($name . ' already exists');
-        if (T\is_valid($type)) throw new E\InvalidType('Unknown type');
+        if (!T\is_valid($type)) throw new E\InvalidType('Unknown type');
         return $name;
     }
 
@@ -84,8 +84,8 @@ class Service {
      * @return the instance (for chaining)
      */
     public function with(string $name, $type = T\free) {
-        $name = $this->checkParameter($name, $type, $this->parameter);
-        $this->parameter[$name] = [
+        $name = $this->checkParameter($name, $type, $this->parameters);
+        $this->parameters[$name] = [
             $type, T\getCheckerFunction($type, $this->method)
         ];
         return $this;
@@ -99,11 +99,52 @@ class Service {
      * @return the instance (for chaining)
      */
     public function withGET(string $name, $type = T\free) {
-        $name = $this->checkParameter($name, $type, $this->extra_parameter);
-        $this->extra_parameter[$name] = [
+        $name = $this->checkParameter($name, $type, $this->extra_parameters);
+        $this->extra_parameters[$name] = [
             $type, T\getCheckerFunction($type, $this->method)
         ];
         return $this;
+    }
+
+    /**
+     * Returns the global key for accessing super-global
+     * @return string
+     */
+    protected function paramKey() : string {
+        if ($this->method == 'post' || $this->method == 'get')
+            return $this->method;
+        return 'input';
+    }
+
+    /**
+     * Check if the service is bootable, according the URI
+     * @param env the super-globals
+     * @return bool
+     */
+    public function isBootable($env) {
+        $method = $env[0];
+        $globals = $env[1];
+        return
+            $this->validMethod($method) &&
+            $this->validParameters($globals)
+            ;
+    }
+
+    /**
+     * Check if the method is valid according the URI
+     * @param the string of the method
+     * @return bool
+     */
+    protected function validMethod(string $method) {
+        return $this->method == $method;
+    }
+
+    /**
+     * Check if the parameters are valids according the URI
+     * @return bool
+     */
+    protected function validParameters() {
+        return true;
     }
 
     /**
@@ -115,6 +156,19 @@ class Service {
 
     // Static content
     protected static $services = [];
+
+    /**
+     * Compute all globals variables for a method
+     */
+    public static function computeGlobals() {
+        $method = strtolower(trim($_SERVER['REQUEST_METHOD']));
+        $global = [];
+        $global['get']  = $_GET;
+        $global['post'] = $_POST;
+        parse_str(file_get_contents('php://input'), $input);
+        $global['input'] = $input;
+        return [$method, $global];
+    }
 
 
 

@@ -29,6 +29,12 @@ require_once 'lib/exceptions.php';
 require_once 'lib/types.php';
 require_once 'lib/service.php';
 
+$test = new router\Service('get', '');
+$env  = router\Service::computeGlobals();
+$test->with('name')->with('age', types\int);
 
-echo "yo";
+
+var_dump($env);
+var_dump($test->isBootable($env));
+var_dump($test);
 ?>
