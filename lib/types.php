@@ -28,7 +28,6 @@ declare(strict_types=1);
  * @author Van de Woestyne Xavier <xaviervdw@gmail.com>
  */
 namespace phun\types;
-
 use \phun\Exceptions as E;
 
 // Kind of types

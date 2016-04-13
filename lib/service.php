@@ -27,6 +27,8 @@ declare(strict_types=1);
  * @author Van de Woestyne Xavier <xaviervdw@gmail.com>
  */
 namespace phun\router;
+use \phun\types as T;
+use \phun\Exceptions as E;
 
 /**
  * Service
@@ -50,9 +52,43 @@ class Service {
      */
     public function __construct(string $method, string $path) {
         $this->uid = uniqid('service-');
+        $this->method = strtolower(trim($method));
+        $this->path = $path;
+        $this->parameters = [];
+        $this->extended_parameters = [];
+        $this->strict = true;
 
         // Store the service
         $this->store();
+    }
+
+    /**
+     * Check if a parameter has a valid name and a valid type
+     * @param string name of the Parameter
+     * @param int type of the Parameter
+     * @param array raw container
+     * @return a trimmed name
+     */
+    protected function checkParameter(string $name, int $type, $container) {
+        $name = trim($name);
+        if (array_key_exists($name, $container) && $name != '')
+            throw new E\InvalidParameterName($name . ' already exists');
+        if (T\is_valid($type)) throw new E\InvalidType('Unknown type');
+        return $name;
+    }
+
+    /**
+     * Add a required parameter
+     * @param string name of the Parameter
+     * @param int type of the Parameter
+     * @return the instance (for chaining)
+     */
+    public function with(string $name, int $type = T\free) {
+        $name = $this->checkParameter($name, $type, $this->parameter);
+        $this->parameter[$name] = [
+            $type, T\getCheckerFunction($type, $this->method)
+        ];
+        return $this;
     }
 
     /**
