@@ -73,7 +73,7 @@ class Service {
     protected function checkParameter(string $name, $type, $container) {
         $name = trim($name);
         if (array_key_exists($name, $container) && $name != '')
-            throw new E\InvalidParameterName($name . ' already exists');
+            throw new E\InvalidParameter($name . ' already exists');
         if (!T\is_valid($type)) throw new E\InvalidType('Unknown type');
         return $name;
     }
@@ -100,6 +100,8 @@ class Service {
      * @return the instance (for chaining)
      */
     public function withGET(string $name, $type = T\free) {
+        if ($this->method == 'get')
+            throw new E\InvalidParameter('GET service could not has extra-parameters');
         $name = $this->checkParameter($name, $type, $this->extra_parameters);
         $this->extra_parameters[$name] = [
             $type, T\getCheckerFunction($type, $this->method)

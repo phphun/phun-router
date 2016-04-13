@@ -29,30 +29,11 @@ declare(strict_types=1);
  */
 namespace phun\Exceptions;
 
+// Prepared for overidder
+class Standard extends \Exception {}
+
 // Type Exception
-class InvalidType extends \Exception {
-    /**
-     * Constructor of an exception
-     * @param string message
-     * @param int code
-     * @param Exception Parent exception
-     */
-    public function __construct($mess, $code = 0, Exception $previous = null) {
-        $mess = '[InvalidType] ' . $mess;
-        parent::__construct($mess, $code, $previous);
-    }
-}
+class InvalidType extends Standard {}
 
 // Parameter Exception
-class InvalidParameterName extends \Exception {
-    /**
-     * Constructor of an exception
-     * @param string message
-     * @param int code
-     * @param Exception Parent exception
-     */
-    public function __construct($mess, $code = 0, Exception $previous = null) {
-        $mess = '[InvalidParameterName] ' . $mess;
-        parent::__construct($mess, $code, $previous);
-    }
-}
+class InvalidParameter extends Standard {}
