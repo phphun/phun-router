@@ -101,7 +101,8 @@ class Service {
      */
     public function withGET(string $name, $type = T\free) {
         if ($this->method == 'get')
-            throw new E\InvalidParameter('GET service could not has extra-parameters');
+            throw new E\InvalidParameter(
+                'GET service could not has extra-parameters');
         $name = $this->checkParameter($name, $type, $this->extra_parameters);
         $this->extra_parameters[$name] = [
             $type, T\getCheckerFunction($type, $this->method)
