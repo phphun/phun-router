@@ -24,7 +24,6 @@ declare(strict_types=1);
 
 /**
  * Useful functions
- * @todo A more comprehensive exception manager
  * @author Van de Woestyne Xavier <xaviervdw@gmail.com>
  */
 namespace phun\lib;
