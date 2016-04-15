@@ -22,20 +22,41 @@
 
 declare(strict_types=1);
 
-namespace phun;
+/**
+ * Useful functions
+ * @todo A more comprehensive exception manager
+ * @author Van de Woestyne Xavier <xaviervdw@gmail.com>
+ */
+namespace phun\lib;
 
-// Library inclusion
-require_once 'lib/exceptions.php';
-require_once 'lib/utils.php';
-require_once 'lib/types.php';
-require_once 'lib/service.php';
+/**
+ * Returns the Base path of a Phun application
+ * @return an Array with all path member
+ */
+function base_path() {
+    $r = pathinfo($_SERVER['SCRIPT_NAME'])['dirname'];
+    return array_values(array_filter(preg_split('/\/|\?|\&/', $r)));
+}
 
-$test = new router\Service('get', '');
-$env  = router\Service::computeGlobals();
-$test->with('name')->with('age', types\float);
+/**
+ * Returns the root of the architecture
+ * @return a String represent the url root of the host
+ */
+function url_root() {
+    $host = $_SERVER['HTTP_HOST'];
+    $base = join(base_path(), '/');
+    return '//' . $host . '/' . $base . '/';
+}
 
-echo lib\relativize_url('http://image/lol') . '<br >';
-echo($env['uri']);
-var_dump($test->isBootable($env));
-var_dump($test);
-?>
+/**
+ * Relativize an Url (for the url rewritting)
+ * An absolute url is not relativized
+ * @param string the url to be relativized
+ * @return string a new url (relativized or not if absolute gived)
+ */
+function relativize_url(string $url) {
+    $parsed = parse_url($url);
+    if (!array_key_exists('host', $parsed)) {
+        return url_root() . $url;
+    } return $url;
+}
