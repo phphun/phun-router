@@ -126,12 +126,13 @@ class Service {
      * @return bool
      */
     public function isBootable($env) {
-        $method = $env[0];
-        $globals = $env[1];
+        $method = $env['method'];
+        $globals = $env['globals'];
         return
             $this->validMethod($method) &&
             $this->validParameters($globals[$this->paramKey()]) &&
-            $this->validExtraParameters($globals['get'])
+            $this->validExtraParameters($globals['get']) &&
+            $this->validFormattedUrl()
             ;
     }
 
@@ -181,6 +182,13 @@ class Service {
         return $this->validRawParameters($this->extra_parameters, $arg);
     }
 
+    /**
+     * Check the url
+     * @return bool
+     */
+    protected function validFormattedUrl() : bool {
+        return true;
+    }
 
 
     /**
@@ -197,13 +205,18 @@ class Service {
      * Compute all globals variables for a method
      */
     public static function computeGlobals() {
+
         $method = strtolower(trim($_SERVER['REQUEST_METHOD']));
         $global = [];
         $global['get']  = $_GET;
         $global['post'] = $_POST;
         parse_str(file_get_contents('php://input'), $input);
         $global['input'] = $input;
-        return [$method, $global];
+
+        return array(
+            'globals' => $global,
+            'method'  => $method,
+        );
     }
 
 
