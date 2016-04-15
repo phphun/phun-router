@@ -53,6 +53,7 @@ class Service {
     public function __construct(string $method, string $path) {
 
         $this->uid = uniqid('service-');
+        $this->mime = 'text/html';
         $this->method = strtolower(trim($method));
         $this->path = $path;
         $this->parameters = [];
@@ -202,7 +203,18 @@ class Service {
     protected static $services = [];
 
     /**
+     * Compute the current URL
+     * @return a string corresponding of the current URL
+     */
+    protected static function retreivePath() : string {
+        $base = pathinfo($_SERVER['SCRIPT_NAME'])['dirname'];
+        $r = explode('?', $_SERVER['REQUEST_URI']);
+        return substr($r[0], strlen($base)+1);
+    }
+
+    /**
      * Compute all globals variables for a method
+     * @return Returns a hashmap with static data
      */
     public static function computeGlobals() {
 
@@ -216,6 +228,7 @@ class Service {
         return array(
             'globals' => $global,
             'method'  => $method,
+            'uri'     => self::retreivePath()
         );
     }
 

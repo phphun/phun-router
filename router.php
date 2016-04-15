@@ -33,6 +33,7 @@ $test = new router\Service('get', '');
 $env  = router\Service::computeGlobals();
 $test->with('name')->with('age', types\float);
 
+var_dump($env['uri']);
 var_dump($test->isBootable($env));
 var_dump($test);
 ?>
