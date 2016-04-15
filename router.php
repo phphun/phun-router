@@ -34,7 +34,7 @@ $test = new router\Service('get', '');
 $env  = router\Service::computeGlobals();
 $test->with('name')->with('age', types\float);
 
-echo lib\relativize_url('http://image/lol') . '<br >';
+echo lib\relativize_url('/image/lol') . '<br >';
 echo($env['uri']);
 var_dump($test->isBootable($env));
 var_dump($test);

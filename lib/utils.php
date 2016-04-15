@@ -29,6 +29,19 @@ declare(strict_types=1);
 namespace phun\lib;
 
 /**
+ * Concat an url
+ * @param the left part of the url
+ * @param the right part of the url
+ * @return a concatenation of the two part of the url
+ */
+function join_url_members(string $left, string $right) {
+    $sep = DIRECTORY_SEPARATOR;
+    $a = rtrim($left, $sep);
+    $b = ltrim($right, $sep);
+    return $a . '/' . $b;
+}
+
+/**
  * Returns the Base path of a Phun application
  * @return an Array with all path member
  */
@@ -56,6 +69,6 @@ function url_root() {
 function relativize_url(string $url) {
     $parsed = parse_url($url);
     if (!array_key_exists('host', $parsed)) {
-        return url_root() . $url;
+        return join_url_members(url_root(), $url);
     } return $url;
 }
