@@ -112,6 +112,14 @@ class Service {
     }
 
     /**
+     * Build the components of a Path
+     * @return void
+     */
+    protected function pathBuilder() {
+        // Tape
+    }
+
+    /**
      * Returns the global key for accessing super-global
      * @return string
      */
