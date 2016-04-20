@@ -30,7 +30,7 @@ require_once 'lib/utils.php';
 require_once 'lib/types.php';
 require_once 'lib/service.php';
 
-$test = new router\Service('get', '{test}');
+$test = new router\Service('get', '{a:.*}');
 $env  = router\Service::computeGlobals();
 $test->with('name')->with('age', types\float);
 

@@ -154,6 +154,11 @@ class Service {
     */
     protected function computeVariant(string $member) {
         if (preg_match('/\{(.+?)\}/', $member, $match)) {
+            $place  = $match[1];
+            $result = explode(':', $place);
+            $total  = count($result);
+            if ($total == 1) { return [T\regexStaticType('string'), $place];}
+            if ($total == 2) { return [T\regexStaticType($result[1]), $result[0]]; }
         }
         throw new E\InvalidPathMember('The member:'.$member.' is invalid');
     }

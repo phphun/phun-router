@@ -173,7 +173,7 @@ function regexStaticType(string $value) : string {
     case 'bool'   : return 'true|false';
     case 'char'   : return '.';
     }
-    if (@preg_match('/'.$value.'/', null) !== false)
+    if (@preg_match('/'.$value.'/', '') !== false)
         return $value;
     throw new E\InvalidType('Unknown type ['. $value .']');
 }
