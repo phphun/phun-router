@@ -43,6 +43,7 @@ class Service {
     protected $extra_parameters;
     protected $path;
     protected $mime;
+    protected $variants;
 
     /**
      * Constructor of service
@@ -129,6 +130,7 @@ class Service {
     */
     protected function computePath($members) {
         $this->path = [];
+        $this->variants = [];
         foreach($members as $member) {
             if (!$this->memberIsVariant($member)) {
                 $this->path[] = [$member];
@@ -157,6 +159,12 @@ class Service {
             $place  = $match[1];
             $result = explode(':', $place);
             $total  = count($result);
+            if ($total > 0) {
+                if (in_array($result[0], $this->variants)) {
+                    throw new E\InvalidPathMember($result[0] . ' is already named');
+                }
+                $this->variants[] = $result[0];
+            }
             if ($total == 1) { return [T\regexStaticType('string'), $place];}
             if ($total == 2) { return [T\regexStaticType($result[1]), $result[0]]; }
         }
@@ -179,13 +187,14 @@ class Service {
      * @return bool
      */
     public function isBootable($env) {
-        $method = $env['method'];
+        $method  = $env['method'];
         $globals = $env['globals'];
+        $uri     = $env['uri'];
         return
             $this->validMethod($method) &&
             $this->validParameters($globals[$this->paramKey()]) &&
             $this->validExtraParameters($globals['get']) &&
-            $this->validFormattedUrl()
+            $this->validFormattedUrl($uri)
             ;
     }
 
@@ -239,8 +248,10 @@ class Service {
      * Check the url
      * @return bool
      */
-    protected function validFormattedUrl() : bool {
-        return true;
+    protected function validFormattedUrl($uri) {
+        $members = array_map( function($elt) { return $elt[0]; }, $this->path);
+        $regex = '#^'.(join('', $members)).'$#';
+        return preg_match($regex, $uri);
     }
 
 
