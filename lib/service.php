@@ -116,7 +116,10 @@ class Service {
      * @return void
      */
     protected function pathBuilder(string $path) {
-        // Tape
+        if ($path == '*') {
+            $this->path = [[".*"]];
+            return;
+        }
         $reg   = '/(\{.+?\})/';
         $flags = PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE;
         $split = preg_split($reg, $path, -1, $flags);

@@ -30,7 +30,7 @@ require_once 'lib/utils.php';
 require_once 'lib/types.php';
 require_once 'lib/service.php';
 
-$test = new router\Service('get', 'aaa/bbb/{test:int}/{test2}.html');
+$test = new router\Service('get', '*');
 $env  = router\Service::computeGlobals();
 
 echo lib\relativize_url('/image/lol') . '<br >';
