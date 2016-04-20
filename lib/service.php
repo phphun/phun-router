@@ -100,10 +100,7 @@ class Service {
      * @param type of the Parameter
      * @return the instance (for chaining)
      */
-    public function withGET(string $name, $type = T\free) {
-        if ($this->method == 'get')
-            throw new E\InvalidParameter(
-                'GET service could not has extra-parameters');
+    public function withGET(string $name, $type = T\free) {        
         $name = $this->checkParameter($name, $type, $this->extra_parameters);
         $this->extra_parameters[$name] = [
             $type, T\getCheckerFunction($type, $this->method)
@@ -179,8 +176,6 @@ class Service {
      * @return string
      */
     protected function paramKey() : string {
-        if ($this->method == 'post' || $this->method == 'get')
-            return $this->method;
         return 'input';
     }
 
@@ -243,7 +238,6 @@ class Service {
      * @return bool
      */
     protected function validExtraParameters($arg) : bool {
-        if ($this->method == 'get') return true;
         return $this->validRawParameters($this->extra_parameters, $arg);
     }
 
@@ -300,4 +294,65 @@ class Service {
 
 
 
+}
+
+/**
+* Specification for GET services
+*/
+class GETService extends Service {
+    /**
+     * Constructor of service
+     * @param string method
+     * @param string path
+     * @return Instance of service (and record it)
+     */
+    public function __construct(string $path) {
+        parent::__construct('get', $path);
+    }
+    /**
+     * Returns the global key for accessing super-global
+     * @return string
+     */
+    protected function paramKey() : string {
+        return 'get';
+    }
+     /**
+     * Add a required extra - parameter
+     * @param string name of the Parameter
+     * @param type of the Parameter
+     * @return the instance (for chaining)
+     */
+    public function withGET(string $name, $type = T\free) { 
+       throw new E\InvalidParameter('GET service could not has extra-parameters'); 
+    }
+    /**
+     * Check extra parameters
+     * @param the global arguments
+     * @return bool
+     */
+    protected function validExtraParameters($arg) : bool {
+        return true;
+    }
+}
+
+/**
+* Specification for POST services
+*/
+class POSTService extends Service {
+    /**
+     * Constructor of service
+     * @param string method
+     * @param string path
+     * @return Instance of service (and record it)
+     */
+    public function __construct(string $path) {
+        parent::__construct('post', $path);
+    }
+    /**
+     * Returns the global key for accessing super-global
+     * @return string
+     */
+    protected function paramKey() : string {
+        return 'post';
+    }
 }
