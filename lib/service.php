@@ -55,11 +55,10 @@ class Service {
         $this->uid = uniqid('service-');
         $this->mime = 'text/html';
         $this->method = strtolower(trim($method));
-        $this->path = $path;
         $this->parameters = [];
         $this->extra_parameters = [];
         $this->strict = true;
-
+        $this->pathBuilder($path);
         // Store the service
         $this->store();
     }
@@ -115,8 +114,48 @@ class Service {
      * Build the components of a Path
      * @return void
      */
-    protected function pathBuilder() {
+    protected function pathBuilder(string $path) {
         // Tape
+        $reg   = '/(\{.+?\})/';
+        $flags = PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE;
+        $split = preg_split($reg, $path, -1, $flags);
+        return $this->computePath($split);
+    }
+    
+    /**
+    * Build the path and his variants 
+    * @param array of path member
+    $ @return void
+    */
+    protected function computePath($members) {
+        $this->path = [];
+        foreach($members as $member) {
+            if (!$this->memberIsVariant($member)) {
+                $this->path[] = [$member];
+            } else {
+                $this->path[] = $this->computeVariant($member);
+            }
+        }
+    }
+    
+    /**
+    * Check if a path member is a variant 
+    * @param string 
+    * @return bool
+    */
+    protected function memberIsVariant(string $elt) : bool {
+        return $elt[0] == '{' && $elt[strlen($elt)-1] == '}';
+    }
+    
+    /**
+    * Compute the type of a variant 
+    * @param string 
+    * @return the value of the type and the url variable
+    */
+    protected function computeVariant(string $member) {
+        if (preg_match('/\{(.+?)\}/', $member, $match)) {
+        }
+        throw new E\InvalidPathMember('The member:'.$member.' is invalid');
     }
 
     /**

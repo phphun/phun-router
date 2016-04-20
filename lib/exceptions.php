@@ -37,3 +37,6 @@ class InvalidType extends Standard {}
 
 // Parameter Exception
 class InvalidParameter extends Standard {}
+
+// Path exception 
+class InvalidPathMember extends Standard {}
