@@ -30,11 +30,4 @@ require_once 'lib/utils.php';
 require_once 'lib/types.php';
 require_once 'lib/service.php';
 
-$test = new router\Service('get', '*');
-$env  = router\Service::computeGlobals();
-
-echo lib\relativize_url('/image/lol') . '<br >';
-echo($env['uri']);
-var_dump($test->isBootable($env));
-var_dump($test);
 ?>
