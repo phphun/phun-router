@@ -67,12 +67,44 @@ class Service {
     $this->store();
   }
 
-  public function param($key) {
-    if (array_key_exists($key, $this->parameters) && $this->strict) {
-      $message = $key . ' is not allowed for this service';
-      throw new E\InvalidParameter($message);
+  /**
+   * Get a typed parameter
+   * @param the container of the parameter
+   * @param the http parameter name
+   * @param the name of the parameter (as a string)
+   * @param a typed value
+   */
+  protected function rawParam($container, $keyname,  $key) {
+    $env    = Service::$environement;
+    $params = $env['globals'][$keyname];
+    if (!array_key_exists($key, $container)) {
+      if ($this->strict) {
+        $message = $key . ' is not allowed for this service';
+        throw new E\InvalidParameter($message);
+      }
+      return $params[$key];
     }
+    $parameter = $params[$key];
+    $type = $container[$key][0];
+    return T\coers($type, $parameter);
+  }
 
+/**
+ * Get the parameter values by his key
+ * @param the parameter 's name
+ * @return a typed value
+ */
+  public function param($key) {
+    return $this->rawParam($this->parameter, $this->paramKey(), $key);
+  }
+
+  /**
+   * Get the extra parameter values by his key
+   * @param the parameter 's name
+   * @return a typed value
+   */
+  public function get($key) {
+    return $this->rawParam($this->extra_parameters, 'get', $key);
   }
 
   /**
@@ -382,6 +414,14 @@ class GETService extends Service {
   */
   protected function validExtraParameters($arg) : bool {
     return true;
+  }
+  /**
+   * Get the extra parameter values by his key
+   * @param the parameter 's name
+   * @return a typed value
+   */
+  public function get($key) {
+    return $this->param($key);
   }
 }
 

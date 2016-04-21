@@ -155,6 +155,7 @@ function getCheckerFunction($type, $method = 'get') {
  */
 function infertypeOf($value) : string {
     if (is_array($value)) return '[\phun\types\string]';
+    // To be continued
 
 }
 
@@ -178,6 +179,21 @@ function regexStaticType(string $value) : string {
     throw new E\InvalidType('Unknown type ['. $value .']');
 }
 
+/**
+ * Coers a value with his type
+ * @param type the type of the value
+ * @param value the value to be coersed
+ * @return a coersed value
+ *
+ */
+function coers($type, $value) {
+  if ($type == int)   return (int) $value;
+  if ($type == float) return (float) $value;
+  if ($type == char)  return $value[0];
+  if ($type == bool)  return (strtolower(trim($value)) != 'false');
+  return $value;
+}
+
 
 /**
  * Force String coersion
@@ -191,7 +207,3 @@ function forceString($value) : string {
     if ($value === 1)     return '1';
     return (string) $value;
 }
-
-
-
-
