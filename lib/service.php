@@ -290,7 +290,7 @@ class Service {
   * @return bool
   */
   public function isBootable() {
-    $env     = Service::computeGlobal();
+    $env     = Service::computeGlobals();
     $method  = $env['method'];
     $globals = $env['globals'];
     $uri     = $env['uri'];
