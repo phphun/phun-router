@@ -31,37 +31,37 @@ require_once 'lib/types.php';
 require_once 'lib/service.php';
 
 /**
-* Create a GET service
-* @param the pathinfo
-* @return a GET Service
-*/
+  * Create a GET service
+  * @param the pathinfo
+  * @return a GET Service
+  */
 function get(string $path = '') : GETService {
   return new GETService($path);
 }
 
 /**
-* Create a POST service
-* @param the pathinfo
-* @return a GET Service
-*/
+ * Create a POST service
+ * @param the pathinfo
+ * @return a GET Service
+ */
 function post(string $path = '') : POSTService {
   return new POSTService($path);
 }
 
 /**
-* Create a PUT service
-* @param the pathinfo
-* @return a GET Service
-*/
+ * Create a PUT service
+ * @param the pathinfo
+ * @return a GET Service
+ */
 function put(string $path = '') : Service {
   return new Service('put', $path);
 }
 
 /**
-* Create a DELETE service
-* @param the pathinfo
-* @return a GET Service
-*/
+ * Create a DELETE service
+ * @param the pathinfo
+ * @return a GET Service
+ */
 function delete(string $path = '') : Service {
   return new Service('delete', $path);
 }
