@@ -167,7 +167,6 @@ class Service {
   * @return bool
   */
   public function controllingCallback($reflex) {
-    // $reflex   = new \ReflectionFunction($callback);
     $nbparams = $reflex->getNumberOfParameters();
     if ($this->strict && $nbparams > count($this->variants)) {
       $message = 'A closure as so much parameters';
@@ -175,8 +174,9 @@ class Service {
     }
     $clone_variants = $this->variants;
     foreach($reflex->getParameters() as $param) {
-      if (!in_array($param, $clone_variants)) {
-        $message = '$'.$param.' is invalid in the closure';
+      $name = $param->getName();
+      if (!in_array($name, $clone_variants)) {
+        $message = '$'.$name.' is invalid in the closure';
         throw new E\InvalidClosure($message);
       }
     }
@@ -188,10 +188,23 @@ class Service {
   * @return the current service for chaining
   */
   public function setController($callback) {
+    $reflex = new \ReflectionFunction($callback);
+    $this->controllingCallback($reflex);
+    $this->controller        = $callback;
+    $this->reflex_controller = $reflex;
     return $this;
   }
 
+  /**
+  * Set a view to the current service
+  * @param a callback
+  * @return the current service for chaining
+  */
   public function setView($callback) {
+    $reflex = new \ReflectionFunction($callback);
+    $this->controllingCallback($reflex);
+    $this->view        = $callback;
+    $this->reflex_view = $reflex;
     return $this;
   }
 
