@@ -38,5 +38,8 @@ class InvalidType extends Standard {}
 // Parameter Exception
 class InvalidParameter extends Standard {}
 
-// Path exception 
+// Path exception
 class InvalidPathMember extends Standard {}
+
+// Invalid closure
+class InvalidClosure extends Standard {}

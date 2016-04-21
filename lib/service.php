@@ -46,6 +46,8 @@ class Service {
   protected $variants;
   protected $view;
   protected $controller;
+  protected $reflex_controller;
+  protected $reflex_view;
 
   /**
   * Constructor of service
@@ -164,9 +166,20 @@ class Service {
   * @param A callback
   * @return bool
   */
-  public function controllingCallback($callback) {
-    $reflex = new \ReflectionFunction($callback);
-
+  public function controllingCallback($reflex) {
+    // $reflex   = new \ReflectionFunction($callback);
+    $nbparams = $reflex->getNumberOfParameters();
+    if ($this->strict && $nbparams > count($this->variants)) {
+      $message = 'A closure as so much parameters';
+      throw new E\InvalidClosure($message);
+    }
+    $clone_variants = $this->variants;
+    foreach($reflex->getParameters() as $param) {
+      if (!in_array($param, $clone_variants)) {
+        $message = '$'.$param.' is invalid in the closure';
+        throw new E\InvalidClosure($message);
+      }
+    }
   }
 
   /**
