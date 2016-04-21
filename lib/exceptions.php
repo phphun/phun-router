@@ -43,3 +43,6 @@ class InvalidPathMember extends Standard {}
 
 // Invalid closure
 class InvalidClosure extends Standard {}
+
+// No candidates
+class NoServicesCandidates extends Standard {}

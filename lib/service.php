@@ -406,7 +406,13 @@ class Service {
   */
   public static function getCurrent() : Service {
     Service::computeGlobal();
-
+    foreach(Service::$services as $service) {
+      if ($service->isBootable()) {
+        return $service;
+      }
+    }
+    $message = 'No services are founded for this uri';
+    throw new E\NoServicesCandidates($message);
   }
 
 }
