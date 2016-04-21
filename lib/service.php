@@ -95,7 +95,11 @@ class Service {
  * @return a typed value
  */
   public function param($key) {
-    return $this->rawParam($this->parameter, $this->paramKey(), $key);
+    return $this->rawParam(
+      $this->parameter,
+      $this->paramKey(),
+      $key
+    );
   }
 
   /**
@@ -104,7 +108,11 @@ class Service {
    * @return a typed value
    */
   public function get($key) {
-    return $this->rawParam($this->extra_parameters, 'get', $key);
+    return $this->rawParam(
+      $this->extra_parameters,
+      'get',
+      $key
+    );
   }
 
   /**
