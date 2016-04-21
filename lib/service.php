@@ -303,6 +303,25 @@ class Service {
   }
 
   /**
+   * Extract variant from the url
+   * @param the current url
+   * @return extracted array
+   */
+  protected function extractUriData($uri) {
+    $regex = '';
+    foreach($this->path as $elt) {
+      if (count($elt)) { $regex .= $elt[0]; }
+      else { $regex .= '(?P<'.$elt[1].'>'.$elt[0].')'; }
+    }
+    preg_match('#'.$regex.'#', $uri, $output);
+    return array_filter(
+      $output,
+      function($k) { return !is_int($k);},
+      ARRAY_FILTER_USE_KEY
+    );
+  }
+
+  /**
   * Check if the method is valid according the URI
   * @param the string of the method
   * @return bool

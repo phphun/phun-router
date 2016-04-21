@@ -66,14 +66,4 @@ function delete(string $path = '') : Service {
   return new Service('delete', $path);
 }
 
-
-
-
-
-use \phun\types as T;
-
-
-
-
-
 ?>
