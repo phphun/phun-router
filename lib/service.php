@@ -44,6 +44,8 @@ class Service {
     protected $path;
     protected $mime;
     protected $variants;
+    protected $view; 
+    protected $controller; 
 
     /**
      * Constructor of service
@@ -52,7 +54,8 @@ class Service {
      * @return Instance of service (and record it)
      */
     public function __construct(string $method, string $path) {
-
+        $this->controller = null; 
+        $this->view = null;
         $this->uid = uniqid('service-');
         $this->mime = 'text/html';
         $this->method = strtolower(trim($method));
@@ -106,6 +109,28 @@ class Service {
             $type, T\getCheckerFunction($type, $this->method)
         ];
         return $this;
+    }
+    
+    /**
+     * Controll if a callback is according to the service
+     * @param A callback 
+     * @return bool
+     */
+    protected function controllingCallback($callback) {
+        
+    }
+    
+    /**
+     * Set a controller to the current service 
+     * @param a callback
+     * @return the current service for chaining
+     */
+    public function setController($callback) {
+        return $this;
+    }
+    
+    public function setView($callback) {
+        return $this; 
     }
 
     /**
@@ -256,7 +281,7 @@ class Service {
      * Store the service into the services list
      */
     protected function store() {
-        self::$services[$this->uid] = $this;
+        Service::$services[$this->uid] = $this;
     }
 
     // Static content
@@ -292,7 +317,14 @@ class Service {
         );
     }
 
-
+    /**
+     * Returns the current Service (according Uri and parameters)
+     * @return the current service
+     */
+    public static function getCurrent() : Service {
+        $env = Service::computeGlobal();
+        
+    }
 
 }
 
