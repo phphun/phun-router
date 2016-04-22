@@ -352,7 +352,7 @@ class Service {
     $this->booted = true;
     $uri = $this->extractUriData();
     $this->applyCallback($this->reflex_controller, $this->controller, $uri);
-    header($this->mime);
+    header('Content-Type: ' . $this->mime);
     $flag = $this->applyCallback($this->reflex_view, $this->view, $uri);
     if ($flag === false) {
       $message = 'This service doesn\'t has view';
