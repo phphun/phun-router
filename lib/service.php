@@ -351,7 +351,6 @@ class Service {
   public function boot() {
     $this->booted = true;
     $uri = $this->extractUriData();
-    var_dump($uri);
     $this->applyCallback($this->reflex_controller, $this->controller, $uri);
     header($this->mime);
     $flag = $this->applyCallback($this->reflex_view, $this->view, $uri);

@@ -66,13 +66,11 @@ function delete(string $path = '') : Service {
   return new Service('delete', $path);
 }
 
-
-$aService = get('user/{id:int}-{name}.html')->with('test', \phun\types\float);
-$aService->setView(function($id, $name) {
-  var_dump($this->get('test'));
-  echo '<h1> '.$name.':' . $this->get('test') . '</h1>';
-});
-
-$curr = Service::getCurrent();
-$curr->boot();
+/**
+ * Start the routing procedure
+ */
+function start() {
+  $service = Service::getCurrent();
+  $service->boot();
+}
 ?>
