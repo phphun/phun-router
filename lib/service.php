@@ -48,6 +48,7 @@ class Service {
   protected $controller;
   protected $reflex_controller;
   protected $reflex_view;
+  protected $booted;
 
   /**
   * Constructor of service
@@ -56,6 +57,9 @@ class Service {
   * @return Instance of service (and record it)
   */
   public function __construct(string $method, string $path) {
+    $this->booted = false;
+    $this->reflex_controller = null;
+    $this->reflex_view = null;
     $this->controller = null;
     $this->view = null;
     $this->uid = uniqid('service-');
@@ -303,14 +307,23 @@ class Service {
   }
 
   /**
+   * Boot the current service
+   */
+  public function boot() {
+    $this->booted = true;
+    var_dump($this->extractUriData());
+  }
+
+  /**
    * Extract variant from the url
    * @param the current url
    * @return extracted array
    */
-  protected function extractUriData($uri) {
+  protected function extractUriData() {
+    $uri = Service::$environement['uri'];
     $regex = '';
     foreach($this->path as $elt) {
-      if (count($elt)) { $regex .= $elt[0]; }
+      if (count($elt) == 1) { $regex .= $elt[0]; }
       else { $regex .= '(?P<'.$elt[1].'>'.$elt[0].')'; }
     }
     preg_match('#'.$regex.'#', $uri, $output);
@@ -424,7 +437,7 @@ class Service {
   * @return the current service
   */
   public static function getCurrent() : Service {
-    Service::computeGlobal();
+    Service::computeGlobals();
     foreach(Service::$services as $service) {
       if ($service->isBootable()) {
         return $service;

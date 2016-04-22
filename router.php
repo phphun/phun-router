@@ -66,4 +66,9 @@ function delete(string $path = '') : Service {
   return new Service('delete', $path);
 }
 
+
+$aService = get('user/{id:int}-{name}.html');
+
+$curr = Service::getCurrent();
+$curr->boot();
 ?>
