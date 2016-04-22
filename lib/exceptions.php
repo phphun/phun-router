@@ -46,3 +46,6 @@ class InvalidClosure extends Standard {}
 
 // No candidates
 class NoServicesCandidates extends Standard {}
+
+// Unbinded service
+class UnbindedService extends Standard {}

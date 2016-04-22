@@ -67,9 +67,10 @@ function delete(string $path = '') : Service {
 }
 
 
-$aService = get('user/{id:int}-{name}.html{name2:float}');
+$aService = get('user/{id:int}-{name}.html')->with('test', \phun\types\float);
 $aService->setView(function($id, $name) {
-
+  var_dump($this->get('test'));
+  echo '<h1> '.$name.':' . $this->get('test') . '</h1>';
 });
 
 $curr = Service::getCurrent();

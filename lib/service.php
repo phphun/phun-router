@@ -102,7 +102,7 @@ class Service {
  */
   public function param($key) {
     return $this->rawParam(
-      $this->parameter,
+      $this->parameters,
       $this->paramKey(),
       $key
     );
@@ -316,11 +316,49 @@ class Service {
   }
 
   /**
+   * Return an array for the linked callback
+   * @param the reflection object
+   * @param the uri data
+   * @return an ordered array of arguments
+   */
+   protected function bindCallback($reflex, $uriData) {
+     $result = [];
+     $params = $reflex->getParameters();
+     foreach($params as $param) {
+       $name = $param->getName();
+       $result[] = $uriData[$name];
+     }
+     return $result;
+   }
+
+   /**
+    * Apply extracted parameters to a callback
+    * @param the reflected function
+    * @param the callback
+    * @param the uri data
+    * @return a flag of execution or not
+    */
+   protected function applyCallback($reflex, $callback, $uri) : bool {
+     if ($callback === null) return false;
+     $args = $this->bindCallback($reflex, $uri);
+     $callback->call($this, ...$args);
+     return true;
+   }
+
+  /**
    * Boot the current service
    */
   public function boot() {
     $this->booted = true;
-    var_dump($this->extractUriData());
+    $uri = $this->extractUriData();
+    var_dump($uri);
+    $this->applyCallback($this->reflex_controller, $this->controller, $uri);
+    header($this->mime);
+    $flag = $this->applyCallback($this->reflex_view, $this->view, $uri);
+    if ($flag === false) {
+      $message = 'This service doesn\'t has view';
+      throw new E\UnbindedService($message);
+    }
   }
 
   /**
@@ -347,15 +385,12 @@ class Service {
    * @return typed values
    */
   protected function coersVariant($var) {
-    $variants = $this->variants;
-    return array_map(
-      function($value, $key) use ($variants){
-        $type = $variants[$key];
-        return (count($type) == 2) ? T\coers($type[1], $value) : $value;
-      },
-      $var,
-      array_keys($var)
-    );
+    $result = [];
+    foreach ($var as $key => $value) {
+      $type = $this->variants[$key];
+      $result[$key] = (count($type) == 2) ? T\coers($type[1], $value) : $value;
+    }
+    return $result;
   }
 
   /**
