@@ -67,7 +67,10 @@ function delete(string $path = '') : Service {
 }
 
 
-$aService = get('user/{id:int}-{name}.html');
+$aService = get('user/{id:int}-{name}.html{name2:float}');
+$aService->setView(function($id, $name) {
+
+});
 
 $curr = Service::getCurrent();
 $curr->boot();

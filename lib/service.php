@@ -179,7 +179,7 @@ class Service {
     $clone_variants = $this->variants;
     foreach($reflex->getParameters() as $param) {
       $name = $param->getName();
-      if (!in_array($name, $clone_variants)) {
+      if (!array_key_exists($name, $clone_variants)) {
         $message = '$'.$name.' is invalid in the closure';
         throw new E\InvalidClosure($message);
       }
@@ -237,7 +237,7 @@ class Service {
     $this->variants = [];
     foreach($members as $member) {
       if (!$this->memberIsVariant($member)) {
-        $this->path[] = [$member];
+        $this->path[] = [[$member]];
       } else {
         $this->path[] = $this->computeVariant($member);
       }
@@ -254,6 +254,17 @@ class Service {
   }
 
   /**
+   * Check if a variant is not already allowed
+   * @param a named variant
+   */
+  protected function checkVariantUnicity($variant) {
+    if (array_key_exists($variant, $this->variants)) {
+      $message = $variant . ' is already named';
+      throw new E\InvalidPathMember($message);
+    }
+  }
+
+  /**
   * Compute the type of a variant
   * @param string
   * @return the value of the type and the url variable
@@ -263,18 +274,16 @@ class Service {
       $place  = $match[1];
       $result = explode(':', $place);
       $total  = count($result);
-      if ($total > 0) {
-        if (in_array($result[0], $this->variants)) {
-          $message = $result[0] . ' is already named';
-          throw new E\InvalidPathMember($message);
-        }
-        $this->variants[] = $result[0];
-      }
+      if ($total > 0) { $this->checkVariantUnicity($result[0]); }
       if ($total == 1) {
-        return [T\regexStaticType('string'), $place];
+        $datatype =  T\regexStaticType('string');
+        $this->variants[$result[0]] = $datatype;
+        return [$datatype, $place];
       }
       if ($total == 2) {
-        return [T\regexStaticType($result[1]), $result[0]];
+        $datatype = T\regexStaticType($result[1]);
+        $this->variants[$result[0]] = $datatype;
+        return [$datatype, $result[0]];
       }
     }
     throw new E\InvalidPathMember('The member:'.$member.' is invalid');
@@ -323,14 +332,29 @@ class Service {
     $uri = Service::$environement['uri'];
     $regex = '';
     foreach($this->path as $elt) {
-      if (count($elt) == 1) { $regex .= $elt[0]; }
-      else { $regex .= '(?P<'.$elt[1].'>'.$elt[0].')'; }
+      if (count($elt) == 1) { $regex .= $elt[0][0]; }
+      else { $regex .= '(?P<'.$elt[1].'>'.$elt[0][0].')'; }
     }
     preg_match('#'.$regex.'#', $uri, $output);
-    return array_filter(
-      $output,
-      function($k) { return !is_int($k);},
-      ARRAY_FILTER_USE_KEY
+    $flag = ARRAY_FILTER_USE_KEY;
+    $var = array_filter($output, function($k) { return !is_int($k);}, $flag);
+    return $this->coersVariant($var);
+  }
+
+  /**
+   * Coers URL variant according to the types
+   * @param the table of the variants
+   * @return typed values
+   */
+  protected function coersVariant($var) {
+    $variants = $this->variants;
+    return array_map(
+      function($value, $key) use ($variants){
+        $type = $variants[$key];
+        return (count($type) == 2) ? T\coers($type[1], $value) : $value;
+      },
+      $var,
+      array_keys($var)
     );
   }
 
@@ -384,7 +408,7 @@ class Service {
   * @return bool
   */
   protected function validFormattedUrl($uri) {
-    $members = array_map( function($elt) { return $elt[0]; }, $this->path);
+    $members = array_map( function($elt) { return $elt[0][0]; }, $this->path);
     $regex = '#^'.(join('', $members)).'$#';
     return preg_match($regex, $uri);
   }

@@ -165,17 +165,17 @@ function infertypeOf($value) : string {
  * @return A regexp representation
  * @throw InvalidType
  */
-function regexStaticType(string $value) : string {
+function regexStaticType(string $value) {
     $tl_value = trim(strtolower($value));
     switch($tl_value) {
-    case 'string' : return '.*';
-    case 'int'    : return '[\+\-]?\d+';
-    case 'float'  : return '[\+\-]?\d+\.\d*';
-    case 'bool'   : return 'true|false';
-    case 'char'   : return '.';
+    case 'string' : return ['.*'];
+    case 'int'    : return ['[\+\-]?\d+', int];
+    case 'float'  : return ['[\+\-]?\d+\.\d*', float];
+    case 'bool'   : return ['true|false', bool];
+    case 'char'   : return ['.', char];
     }
     if (@preg_match('/'.$value.'/', '') !== false)
-        return $value;
+        return [$value];
     throw new E\InvalidType('Unknown type ['. $value .']');
 }
 
