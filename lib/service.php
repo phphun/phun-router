@@ -49,6 +49,7 @@ class Service {
   protected $reflex_controller;
   protected $reflex_view;
   protected $booted;
+  protected $http_code;
 
   /**
   * Constructor of service
@@ -64,6 +65,7 @@ class Service {
     $this->view = null;
     $this->uid = uniqid('service-');
     $this->mime = 'text/html';
+    $this->http_code = 200;
     $this->method = strtolower(trim($method));
     $this->parameters = [];
     $this->extra_parameters = [];
@@ -134,6 +136,16 @@ class Service {
     throw new E\InvalidParameter($name . ' already exists');
     if (!T\is_valid($type)) throw new E\InvalidType('Unknown type');
     return $name;
+  }
+
+  /**
+   * Set an HTTP Code for the service (by default, 200)
+   * @param int the new HTTP's code
+   * @return the service (for chaining)
+   */
+  public function httpCode(int $code) {
+    $this->http_code = $code;
+    return $this;
   }
 
   /**
@@ -352,6 +364,7 @@ class Service {
     $this->booted = true;
     $uri = $this->extractUriData();
     $this->applyCallback($this->reflex_controller, $this->controller, $uri);
+    http_response_code($this->http_code);
     header('Content-Type: ' . $this->mime);
     $flag = $this->applyCallback($this->reflex_view, $this->view, $uri);
     if ($flag === false) {
