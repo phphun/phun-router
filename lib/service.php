@@ -124,6 +124,13 @@ class Service {
   }
 
   /**
+   * Return all get Parameters
+   */
+  protected function getParameters() {
+    return $this->extra_parameters;
+  }
+
+  /**
   * Check if a parameter has a valid name and a valid type
   * @param string name of the Parameter
   * @param int type of the Parameter
@@ -460,6 +467,33 @@ class Service {
     return preg_match($regex, $uri);
   }
 
+  /**
+   * Generate a link of the service
+   * @param variants : a list of variants
+   * @param get : a list of get arguments
+   * @return a string representing the link
+   */
+  public function link($variants = [], $get = []) : string {
+    $path = $this->computeLinkPath($variants);
+    $gets = $this->computeLinkGet($get);
+    return $gets;
+  }
+
+  /**
+   * Compute get arguments
+   * @param array of get values
+   * @return http parameters as a string
+   */
+  protected function computeLinkGet($get) : string {
+    $flag = $this->validRawParameters($this->getParameters(), $get);
+    if (!$flag) throw new E\InvalidParameter('parameters are invalid');
+    if (count($get) == 0) return '';
+    $result = [];
+    foreach($get as $name => $value) {
+      $result[] = $name . '=' . $value;
+    }
+    return '?' . join('&', $result);
+  }
 
   /**
   * Store the service into the services list
@@ -565,6 +599,13 @@ class GETService extends Service {
    */
   public function get($key) {
     return $this->param($key);
+  }
+
+  /**
+   * Return all get Parameters
+   */
+  protected function getParameters() {
+    return $this->parameters;
   }
 }
 
