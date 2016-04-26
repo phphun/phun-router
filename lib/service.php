@@ -479,6 +479,10 @@ class Service {
     return $gets;
   }
 
+  protected function computeLinkPath($variants) : string {
+    return '';
+  }
+
   /**
    * Compute get arguments
    * @param array of get values
