@@ -476,11 +476,25 @@ class Service {
   public function link($variants = [], $get = []) : string {
     $path = $this->computeLinkPath($variants);
     $gets = $this->computeLinkGet($get);
-    return $gets;
+    return $path . $gets;
   }
 
+  /**
+   * Compute a variant argument
+   * @param the variant list (as key value storage)
+   * @return a fragment of the url
+   */
   protected function computeLinkPath($variants) : string {
-    return '';
+    echo '<pre>' . print_r($this->path, true) . '</pre>';
+    $result = '';
+    foreach($this->path as $member) {
+      if (count($member) == 1) {
+        $result .= $member[0][0];
+      } else {
+        $result .= $this->computeDynamicVariant($variants, $member);
+      }
+    }
+    return $result;
   }
 
   /**
