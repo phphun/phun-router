@@ -29,6 +29,7 @@ declare(strict_types=1);
 namespace phun\router;
 use \phun\types as T;
 use \phun\Exceptions as E;
+use \phun\lib as L;
 
 /**
 * Service
@@ -357,10 +358,11 @@ class Service {
     * @param the uri data
     * @return a flag of execution or not
     */
-   protected function applyCallback($reflex, $callback, $uri) : bool {
-     if ($callback === null) return false;
+   protected function applyCallback($reflex, $cb, $uri, $o = false) : bool {
+     if ($cb === null) return false;
      $args = $this->bindCallback($reflex, $uri);
-     $callback->call($this, ...$args);
+     if ($o) {echo $cb->call($this, ...$args);}
+     else {$cb->call($this, ...$args);}
      return true;
    }
 
@@ -373,7 +375,7 @@ class Service {
     $this->applyCallback($this->reflex_controller, $this->controller, $uri);
     http_response_code($this->http_code);
     header('Content-Type: ' . $this->mime);
-    $flag = $this->applyCallback($this->reflex_view, $this->view, $uri);
+    $flag = $this->applyCallback($this->reflex_view, $this->view, $uri, true);
     if ($flag === false) {
       $message = 'This service doesn\'t has view';
       throw new E\UnbindedService($message);
@@ -476,7 +478,7 @@ class Service {
   public function link($variants = [], $get = []) : string {
     $path = $this->computeLinkPath($variants);
     $gets = $this->computeLinkGet($get);
-    return $path . $gets;
+    return L\relativize_url($path . $gets);
   }
 
   /**
@@ -485,7 +487,6 @@ class Service {
    * @return a fragment of the url
    */
   protected function computeLinkPath($variants) : string {
-    echo '<pre>' . print_r($this->path, true) . '</pre>';
     $result = '';
     foreach($this->path as $member) {
       if (count($member) == 1) {
@@ -495,6 +496,24 @@ class Service {
       }
     }
     return $result;
+  }
+
+  /**
+   * Compute a dynamic value
+   * @param the variant list (as key value storage)
+   * @param the current member
+   * @return a fragment of the url
+   */
+  protected function computeDynamicVariant($variants, $member) : string {
+    $key = $member[1];
+    if (!array_key_exists($key, $variants))
+      throw new E\InvalidPathMember($key.' is missing');
+    $variant  = $variants[$key];
+    $type     = $member[0][1];
+    $callback = T\getCheckerFunction($type, $this->method);
+    if (!$callback($variant))
+      throw new E\InvalidPathMember($key.' has a bad type');
+    return (string) $variant;
   }
 
   /**

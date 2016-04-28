@@ -74,7 +74,6 @@ function start() {
   $service->boot();
 }
 
-$t = get('a/b/c')->with('AHA')->with('YO', \phun\types\int);
-var_dump($t->link([], ['AHA' => 'ell', 'YO' => 17]));
+
 
 ?>
