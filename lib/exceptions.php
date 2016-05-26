@@ -20,7 +20,7 @@
   SOFTWARE.
 */
 
-declare(strict_types=1);
+declare (strict_types=1);
 
 /**
  * Provide Exceptions for Phun
@@ -30,22 +30,36 @@ declare(strict_types=1);
 namespace phun\Exceptions;
 
 // Prepared for overidder
-class Standard extends \Exception {}
+class Standard extends \Exception
+{
+}
 
 // Type Exception
-class InvalidType extends Standard {}
+class InvalidType extends Standard
+{
+}
 
 // Parameter Exception
-class InvalidParameter extends Standard {}
+class InvalidParameter extends Standard
+{
+}
 
 // Path exception
-class InvalidPathMember extends Standard {}
+class InvalidPathMember extends Standard
+{
+}
 
 // Invalid closure
-class InvalidClosure extends Standard {}
+class InvalidClosure extends Standard
+{
+}
 
 // No candidates
-class NoServicesCandidates extends Standard {}
+class NoServicesCandidates extends Standard
+{
+}
 
 // Unbinded service
-class UnbindedService extends Standard {}
+class UnbindedService extends Standard
+{
+}

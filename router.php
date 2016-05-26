@@ -20,7 +20,7 @@
   SOFTWARE.
 */
 
-declare(strict_types=1);
+declare (strict_types=1);
 
 namespace phun\router;
 
@@ -35,8 +35,9 @@ require_once 'lib/service.php';
   * @param the pathinfo
   * @return a GET Service
   */
-function get(string $path = '') : GETService {
-  return new GETService($path);
+function get(string $path = '') : GETService
+{
+    return new GETService($path);
 }
 
 /**
@@ -44,8 +45,9 @@ function get(string $path = '') : GETService {
  * @param the pathinfo
  * @return a GET Service
  */
-function post(string $path = '') : POSTService {
-  return new POSTService($path);
+function post(string $path = '') : POSTService
+{
+    return new POSTService($path);
 }
 
 /**
@@ -53,8 +55,9 @@ function post(string $path = '') : POSTService {
  * @param the pathinfo
  * @return a GET Service
  */
-function put(string $path = '') : Service {
-  return new Service('put', $path);
+function put(string $path = '') : Service
+{
+    return new Service('put', $path);
 }
 
 /**
@@ -62,18 +65,16 @@ function put(string $path = '') : Service {
  * @param the pathinfo
  * @return a GET Service
  */
-function delete(string $path = '') : Service {
-  return new Service('delete', $path);
+function delete(string $path = '') : Service
+{
+    return new Service('delete', $path);
 }
 
 /**
  * Start the routing procedure
  */
-function start() {
-  $service = Service::getCurrent();
-  $service->boot();
+function start()
+{
+    $service = Service::getCurrent();
+    $service->boot();
 }
-
-
-
-?>

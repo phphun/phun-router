@@ -20,7 +20,7 @@
   SOFTWARE.
 */
 
-declare(strict_types=1);
+declare (strict_types=1);
 
 /**
  * Useful functions
@@ -34,7 +34,8 @@ namespace phun\lib;
  * @param the right part of the url
  * @return a concatenation of the two part of the url
  */
-function join_url_members(string $left, string $right) {
+function join_url_members(string $left, string $right)
+{
     $sep = DIRECTORY_SEPARATOR;
     $a = rtrim($left, $sep);
     $b = ltrim($right, $sep);
@@ -45,7 +46,8 @@ function join_url_members(string $left, string $right) {
  * Returns the Base path of a Phun application
  * @return an Array with all path member
  */
-function base_path() {
+function base_path()
+{
     $r = pathinfo($_SERVER['SCRIPT_NAME'])['dirname'];
     return array_values(array_filter(preg_split('/\/|\?|\&/', $r)));
 }
@@ -54,7 +56,8 @@ function base_path() {
  * Returns the root of the architecture
  * @return a String represent the url root of the host
  */
-function url_root() {
+function url_root()
+{
     $host = $_SERVER['HTTP_HOST'];
     $base = join(base_path(), '/');
     return '//' . $host . '/' . $base . '/';
@@ -66,9 +69,11 @@ function url_root() {
  * @param string the url to be relativized
  * @return string a new url (relativized or not if absolute gived)
  */
-function relativize_url(string $url) {
+function relativize_url(string $url)
+{
     $parsed = parse_url($url);
     if (!array_key_exists('host', $parsed)) {
         return join_url_members(url_root(), $url);
-    } return $url;
+    }
+    return $url;
 }

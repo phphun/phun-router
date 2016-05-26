@@ -20,13 +20,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-declare(strict_types=1);
+declare (strict_types=1);
 
 /**
 * Provide Services for Phun
 * @author Van de Woestyne Xavier <xaviervdw@gmail.com>
 */
 namespace phun\router;
+
 use \phun\types as T;
 use \phun\Exceptions as E;
 use \phun\lib as L;
@@ -35,22 +36,23 @@ use \phun\lib as L;
 * Service
 * Describe a resource of a PHUN application
 */
-class Service {
+class Service
+{
 
-  // Attributes
+    // Attributes
   protected $uid;
-  protected $method;
-  protected $parameters;
-  protected $extra_parameters;
-  protected $path;
-  protected $mime;
-  protected $variants;
-  protected $view;
-  protected $controller;
-  protected $reflex_controller;
-  protected $reflex_view;
-  protected $booted;
-  protected $http_code;
+    protected $method;
+    protected $parameters;
+    protected $extra_parameters;
+    protected $path;
+    protected $mime;
+    protected $variants;
+    protected $view;
+    protected $controller;
+    protected $reflex_controller;
+    protected $reflex_view;
+    protected $booted;
+    protected $http_code;
 
   /**
   * Constructor of service
@@ -58,20 +60,21 @@ class Service {
   * @param string path
   * @return Instance of service (and record it)
   */
-  public function __construct(string $method, string $path) {
-    $this->booted = false;
-    $this->reflex_controller = null;
-    $this->reflex_view = null;
-    $this->controller = null;
-    $this->view = null;
-    $this->uid = uniqid('service-');
-    $this->mime = 'text/html';
-    $this->http_code = 200;
-    $this->method = strtolower(trim($method));
-    $this->parameters = [];
-    $this->extra_parameters = [];
-    $this->strict = true;
-    $this->pathBuilder($path);
+  public function __construct(string $method, string $path)
+  {
+      $this->booted = false;
+      $this->reflex_controller = null;
+      $this->reflex_view = null;
+      $this->controller = null;
+      $this->view = null;
+      $this->uid = uniqid('service-');
+      $this->mime = 'text/html';
+      $this->http_code = 200;
+      $this->method = strtolower(trim($method));
+      $this->parameters = [];
+      $this->extra_parameters = [];
+      $this->strict = true;
+      $this->pathBuilder($path);
     // Store the service
     $this->store();
   }
@@ -83,19 +86,20 @@ class Service {
    * @param the name of the parameter (as a string)
    * @param a typed value
    */
-  protected function rawParam($container, $keyname,  $key) {
-    $env    = Service::$environement;
-    $params = $env['globals'][$keyname];
-    if (!array_key_exists($key, $container)) {
-      if ($this->strict) {
-        $message = $key . ' is not allowed for this service';
-        throw new E\InvalidParameter($message);
+  protected function rawParam($container, $keyname,  $key)
+  {
+      $env    = Service::$environement;
+      $params = $env['globals'][$keyname];
+      if (!array_key_exists($key, $container)) {
+          if ($this->strict) {
+              $message = $key . ' is not allowed for this service';
+              throw new E\InvalidParameter($message);
+          }
+          return $params[$key];
       }
-      return $params[$key];
-    }
-    $parameter = $params[$key];
-    $type = $container[$key][0];
-    return T\coers($type, $parameter);
+      $parameter = $params[$key];
+      $type = $container[$key][0];
+      return T\coers($type, $parameter);
   }
 
 /**
@@ -103,8 +107,9 @@ class Service {
  * @param the parameter 's name
  * @return a typed value
  */
-  public function param($key) {
-    return $this->rawParam(
+  public function param($key)
+  {
+      return $this->rawParam(
       $this->parameters,
       $this->paramKey(),
       $key
@@ -116,8 +121,9 @@ class Service {
    * @param the parameter 's name
    * @return a typed value
    */
-  public function get($key) {
-    return $this->rawParam(
+  public function get($key)
+  {
+      return $this->rawParam(
       $this->extra_parameters,
       'get',
       $key
@@ -127,8 +133,9 @@ class Service {
   /**
    * Return all get Parameters
    */
-  protected function getParameters() {
-    return $this->extra_parameters;
+  protected function getParameters()
+  {
+      return $this->extra_parameters;
   }
 
   /**
@@ -138,12 +145,16 @@ class Service {
   * @param array raw container
   * @return a trimmed name
   */
-  protected function checkParameter(string $name, $type, $container) {
-    $name = trim($name);
-    if (array_key_exists($name, $container) && $name != '')
-    throw new E\InvalidParameter($name . ' already exists');
-    if (!T\is_valid($type)) throw new E\InvalidType('Unknown type');
-    return $name;
+  protected function checkParameter(string $name, $type, $container)
+  {
+      $name = trim($name);
+      if (array_key_exists($name, $container) && $name != '') {
+          throw new E\InvalidParameter($name . ' already exists');
+      }
+      if (!T\is_valid($type)) {
+          throw new E\InvalidType('Unknown type');
+      }
+      return $name;
   }
 
   /**
@@ -151,9 +162,10 @@ class Service {
    * @param int the new HTTP's code
    * @return the service (for chaining)
    */
-  public function httpCode(int $code) {
-    $this->http_code = $code;
-    return $this;
+  public function httpCode(int $code)
+  {
+      $this->http_code = $code;
+      return $this;
   }
 
   /**
@@ -162,13 +174,13 @@ class Service {
   * @param type of the Parameter
   * @return the instance (for chaining)
   */
-  public function with(string $name, $type = T\free) {
-    $name = $this->checkParameter($name, $type, $this->parameters);
-    $this->parameters[$name] = [
+  public function with(string $name, $type = T\free)
+  {
+      $name = $this->checkParameter($name, $type, $this->parameters);
+      $this->parameters[$name] = [
       $type, T\getCheckerFunction($type, $this->method)
     ];
-    return $this;
-
+      return $this;
   }
 
   /**
@@ -177,12 +189,13 @@ class Service {
   * @param type of the Parameter
   * @return the instance (for chaining)
   */
-  public function withGET(string $name, $type = T\free) {
-    $name = $this->checkParameter($name, $type, $this->extra_parameters);
-    $this->extra_parameters[$name] = [
+  public function withGET(string $name, $type = T\free)
+  {
+      $name = $this->checkParameter($name, $type, $this->extra_parameters);
+      $this->extra_parameters[$name] = [
       $type, T\getCheckerFunction($type, $this->method)
     ];
-    return $this;
+      return $this;
   }
 
   /**
@@ -190,20 +203,21 @@ class Service {
   * @param A callback
   * @return bool
   */
-  public function controllingCallback($reflex) {
-    $nbparams = $reflex->getNumberOfParameters();
-    if ($this->strict && $nbparams > count($this->variants)) {
-      $message = 'A closure as so much parameters';
-      throw new E\InvalidClosure($message);
-    }
-    $clone_variants = $this->variants;
-    foreach($reflex->getParameters() as $param) {
-      $name = $param->getName();
-      if (!array_key_exists($name, $clone_variants)) {
-        $message = '$'.$name.' is invalid in the closure';
-        throw new E\InvalidClosure($message);
+  public function controllingCallback($reflex)
+  {
+      $nbparams = $reflex->getNumberOfParameters();
+      if ($this->strict && $nbparams > count($this->variants)) {
+          $message = 'A closure as so much parameters';
+          throw new E\InvalidClosure($message);
       }
-    }
+      $clone_variants = $this->variants;
+      foreach ($reflex->getParameters() as $param) {
+          $name = $param->getName();
+          if (!array_key_exists($name, $clone_variants)) {
+              $message = '$'.$name.' is invalid in the closure';
+              throw new E\InvalidClosure($message);
+          }
+      }
   }
 
   /**
@@ -211,12 +225,13 @@ class Service {
   * @param a callback
   * @return the current service for chaining
   */
-  public function setController($callback) {
-    $reflex = new \ReflectionFunction($callback);
-    $this->controllingCallback($reflex);
-    $this->controller        = $callback;
-    $this->reflex_controller = $reflex;
-    return $this;
+  public function setController($callback)
+  {
+      $reflex = new \ReflectionFunction($callback);
+      $this->controllingCallback($reflex);
+      $this->controller        = $callback;
+      $this->reflex_controller = $reflex;
+      return $this;
   }
 
   /**
@@ -224,27 +239,29 @@ class Service {
   * @param a callback
   * @return the current service for chaining
   */
-  public function setView($callback) {
-    $reflex = new \ReflectionFunction($callback);
-    $this->controllingCallback($reflex);
-    $this->view        = $callback;
-    $this->reflex_view = $reflex;
-    return $this;
+  public function setView($callback)
+  {
+      $reflex = new \ReflectionFunction($callback);
+      $this->controllingCallback($reflex);
+      $this->view        = $callback;
+      $this->reflex_view = $reflex;
+      return $this;
   }
 
   /**
   * Build the components of a Path
   * @return void
   */
-  protected function pathBuilder(string $path) {
-    if ($path == '*') {
-      $this->path = [[".*"]];
-      return;
-    }
-    $reg   = '/(\{.+?\})/';
-    $flags = PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE;
-    $split = preg_split($reg, $path, -1, $flags);
-    return $this->computePath($split);
+  protected function pathBuilder(string $path)
+  {
+      if ($path == '*') {
+          $this->path = [[".*"]];
+          return;
+      }
+      $reg   = '/(\{.+?\})/';
+      $flags = PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE;
+      $split = preg_split($reg, $path, -1, $flags);
+      return $this->computePath($split);
   }
 
   /**
@@ -252,16 +269,17 @@ class Service {
   * @param array of path member
   * @return void
   */
-  protected function computePath($members) {
-    $this->path = [];
-    $this->variants = [];
-    foreach($members as $member) {
-      if (!$this->memberIsVariant($member)) {
-        $this->path[] = [[$member]];
-      } else {
-        $this->path[] = $this->computeVariant($member);
+  protected function computePath($members)
+  {
+      $this->path = [];
+      $this->variants = [];
+      foreach ($members as $member) {
+          if (!$this->memberIsVariant($member)) {
+              $this->path[] = [[$member]];
+          } else {
+              $this->path[] = $this->computeVariant($member);
+          }
       }
-    }
   }
 
   /**
@@ -269,19 +287,21 @@ class Service {
   * @param string
   * @return bool
   */
-  protected function memberIsVariant(string $elt) : bool {
-    return $elt[0] == '{' && $elt[strlen($elt)-1] == '}';
+  protected function memberIsVariant(string $elt) : bool
+  {
+      return $elt[0] == '{' && $elt[strlen($elt)-1] == '}';
   }
 
   /**
    * Check if a variant is not already allowed
    * @param a named variant
    */
-  protected function checkVariantUnicity($variant) {
-    if (array_key_exists($variant, $this->variants)) {
-      $message = $variant . ' is already named';
-      throw new E\InvalidPathMember($message);
-    }
+  protected function checkVariantUnicity($variant)
+  {
+      if (array_key_exists($variant, $this->variants)) {
+          $message = $variant . ' is already named';
+          throw new E\InvalidPathMember($message);
+      }
   }
 
   /**
@@ -289,32 +309,36 @@ class Service {
   * @param string
   * @return the value of the type and the url variable
   */
-  protected function computeVariant(string $member) {
-    if (preg_match('/\{(.+?)\}/', $member, $match)) {
-      $place  = $match[1];
-      $result = explode(':', $place);
-      $total  = count($result);
-      if ($total > 0) { $this->checkVariantUnicity($result[0]); }
-      if ($total == 1) {
-        $datatype =  T\regexStaticType('string');
-        $this->variants[$result[0]] = $datatype;
-        return [$datatype, $place];
+  protected function computeVariant(string $member)
+  {
+      if (preg_match('/\{(.+?)\}/', $member, $match)) {
+          $place  = $match[1];
+          $result = explode(':', $place);
+          $total  = count($result);
+          if ($total > 0) {
+              $this->checkVariantUnicity($result[0]);
+          }
+          if ($total == 1) {
+              $datatype =  T\regexStaticType('string');
+              $this->variants[$result[0]] = $datatype;
+              return [$datatype, $place];
+          }
+          if ($total == 2) {
+              $datatype = T\regexStaticType($result[1]);
+              $this->variants[$result[0]] = $datatype;
+              return [$datatype, $result[0]];
+          }
       }
-      if ($total == 2) {
-        $datatype = T\regexStaticType($result[1]);
-        $this->variants[$result[0]] = $datatype;
-        return [$datatype, $result[0]];
-      }
-    }
-    throw new E\InvalidPathMember('The member:'.$member.' is invalid');
+      throw new E\InvalidPathMember('The member:'.$member.' is invalid');
   }
 
   /**
   * Returns the global key for accessing super-global
   * @return string
   */
-  protected function paramKey() : string {
-    return 'input';
+  protected function paramKey() : string
+  {
+      return 'input';
   }
 
   /**
@@ -322,12 +346,13 @@ class Service {
   * @param env the super-globals
   * @return bool
   */
-  public function isBootable() {
-    $env     = Service::computeGlobals();
-    $method  = $env['method'];
-    $globals = $env['globals'];
-    $uri     = $env['uri'];
-    return
+  public function isBootable()
+  {
+      $env     = Service::computeGlobals();
+      $method  = $env['method'];
+      $globals = $env['globals'];
+      $uri     = $env['uri'];
+      return
       $this->validMethod($method) &&
       $this->validParameters($globals[$this->paramKey()]) &&
       $this->validExtraParameters($globals['get']) &&
@@ -341,14 +366,15 @@ class Service {
    * @param the uri data
    * @return an ordered array of arguments
    */
-   protected function bindCallback($reflex, $uriData) {
-     $result = [];
-     $params = $reflex->getParameters();
-     foreach($params as $param) {
-       $name = $param->getName();
-       $result[] = $uriData[$name];
-     }
-     return $result;
+   protected function bindCallback($reflex, $uriData)
+   {
+       $result = [];
+       $params = $reflex->getParameters();
+       foreach ($params as $param) {
+           $name = $param->getName();
+           $result[] = $uriData[$name];
+       }
+       return $result;
    }
 
    /**
@@ -358,28 +384,35 @@ class Service {
     * @param the uri data
     * @return a flag of execution or not
     */
-   protected function applyCallback($reflex, $cb, $uri, $o = false) : bool {
-     if ($cb === null) return false;
-     $args = $this->bindCallback($reflex, $uri);
-     if ($o) {echo $cb->call($this, ...$args);}
-     else {$cb->call($this, ...$args);}
-     return true;
+   protected function applyCallback($reflex, $cb, $uri, $o = false) : bool
+   {
+       if ($cb === null) {
+           return false;
+       }
+       $args = $this->bindCallback($reflex, $uri);
+       if ($o) {
+           echo $cb->call($this, ...$args);
+       } else {
+           $cb->call($this, ...$args);
+       }
+       return true;
    }
 
   /**
    * Boot the current service
    */
-  public function boot() {
-    $this->booted = true;
-    $uri = $this->extractUriData();
-    $this->applyCallback($this->reflex_controller, $this->controller, $uri);
-    http_response_code($this->http_code);
-    header('Content-Type: ' . $this->mime);
-    $flag = $this->applyCallback($this->reflex_view, $this->view, $uri, true);
-    if ($flag === false) {
-      $message = 'This service doesn\'t has view';
-      throw new E\UnbindedService($message);
-    }
+  public function boot()
+  {
+      $this->booted = true;
+      $uri = $this->extractUriData();
+      $this->applyCallback($this->reflex_controller, $this->controller, $uri);
+      http_response_code($this->http_code);
+      header('Content-Type: ' . $this->mime);
+      $flag = $this->applyCallback($this->reflex_view, $this->view, $uri, true);
+      if ($flag === false) {
+          $message = 'This service doesn\'t has view';
+          throw new E\UnbindedService($message);
+      }
   }
 
   /**
@@ -387,17 +420,21 @@ class Service {
    * @param the current url
    * @return extracted array
    */
-  protected function extractUriData() {
-    $uri = Service::$environement['uri'];
-    $regex = '';
-    foreach($this->path as $elt) {
-      if (count($elt) == 1) { $regex .= $elt[0][0]; }
-      else { $regex .= '(?P<'.$elt[1].'>'.$elt[0][0].')'; }
-    }
-    preg_match('#'.$regex.'#', $uri, $output);
-    $flag = ARRAY_FILTER_USE_KEY;
-    $var = array_filter($output, function($k) { return !is_int($k);}, $flag);
-    return $this->coersVariant($var);
+  protected function extractUriData()
+  {
+      $uri = Service::$environement['uri'];
+      $regex = '';
+      foreach ($this->path as $elt) {
+          if (count($elt) == 1) {
+              $regex .= $elt[0][0];
+          } else {
+              $regex .= '(?P<'.$elt[1].'>'.$elt[0][0].')';
+          }
+      }
+      preg_match('#'.$regex.'#', $uri, $output);
+      $flag = ARRAY_FILTER_USE_KEY;
+      $var = array_filter($output, function ($k) { return !is_int($k);}, $flag);
+      return $this->coersVariant($var);
   }
 
   /**
@@ -405,13 +442,14 @@ class Service {
    * @param the table of the variants
    * @return typed values
    */
-  protected function coersVariant($var) {
-    $result = [];
-    foreach ($var as $key => $value) {
-      $type = $this->variants[$key];
-      $result[$key] = (count($type) == 2) ? T\coers($type[1], $value) : $value;
-    }
-    return $result;
+  protected function coersVariant($var)
+  {
+      $result = [];
+      foreach ($var as $key => $value) {
+          $type = $this->variants[$key];
+          $result[$key] = (count($type) == 2) ? T\coers($type[1], $value) : $value;
+      }
+      return $result;
   }
 
   /**
@@ -419,8 +457,9 @@ class Service {
   * @param the string of the method
   * @return bool
   */
-  protected function validMethod(string $method) : bool {
-    return $this->method == $method;
+  protected function validMethod(string $method) : bool
+  {
+      return $this->method == $method;
   }
 
   /**
@@ -429,16 +468,22 @@ class Service {
   * @param the global arguments
   * @return bool
   */
-  protected function validRawParameters($container, $arg) : bool {
-    if ($this->strict && (count($arg) != count($container)))
-    return false;
-    foreach($container as $key => $value) {
-      $type = $value[0];
-      $callback = $value[1];
-      if (!array_key_exists($key, $arg)) return false;
-      if (!$callback($arg[$key])) return false;
-    }
-    return true;
+  protected function validRawParameters($container, $arg) : bool
+  {
+      if ($this->strict && (count($arg) != count($container))) {
+          return false;
+      }
+      foreach ($container as $key => $value) {
+          $type = $value[0];
+          $callback = $value[1];
+          if (!array_key_exists($key, $arg)) {
+              return false;
+          }
+          if (!$callback($arg[$key])) {
+              return false;
+          }
+      }
+      return true;
   }
 
   /**
@@ -446,8 +491,9 @@ class Service {
   * @param the global arguments
   * @return bool
   */
-  protected function validParameters($arg) : bool {
-    return $this->validRawParameters($this->parameters, $arg);
+  protected function validParameters($arg) : bool
+  {
+      return $this->validRawParameters($this->parameters, $arg);
   }
 
   /**
@@ -455,18 +501,20 @@ class Service {
   * @param the global arguments
   * @return bool
   */
-  protected function validExtraParameters($arg) : bool {
-    return $this->validRawParameters($this->extra_parameters, $arg);
+  protected function validExtraParameters($arg) : bool
+  {
+      return $this->validRawParameters($this->extra_parameters, $arg);
   }
 
   /**
   * Check the url
   * @return bool
   */
-  protected function validFormattedUrl($uri) {
-    $members = array_map( function($elt) { return $elt[0][0]; }, $this->path);
-    $regex = '#^'.(join('', $members)).'$#';
-    return preg_match($regex, $uri);
+  protected function validFormattedUrl($uri)
+  {
+      $members = array_map(function ($elt) { return $elt[0][0]; }, $this->path);
+      $regex = '#^'.(join('', $members)).'$#';
+      return preg_match($regex, $uri);
   }
 
   /**
@@ -475,10 +523,11 @@ class Service {
    * @param get : a list of get arguments
    * @return a string representing the link
    */
-  public function link($variants = [], $get = []) : string {
-    $path = $this->computeLinkPath($variants);
-    $gets = $this->computeLinkGet($get);
-    return L\relativize_url($path . $gets);
+  public function link($variants = [], $get = []) : string
+  {
+      $path = $this->computeLinkPath($variants);
+      $gets = $this->computeLinkGet($get);
+      return L\relativize_url($path . $gets);
   }
 
   /**
@@ -486,16 +535,17 @@ class Service {
    * @param the variant list (as key value storage)
    * @return a fragment of the url
    */
-  protected function computeLinkPath($variants) : string {
-    $result = '';
-    foreach($this->path as $member) {
-      if (count($member) == 1) {
-        $result .= $member[0][0];
-      } else {
-        $result .= $this->computeDynamicVariant($variants, $member);
+  protected function computeLinkPath($variants) : string
+  {
+      $result = '';
+      foreach ($this->path as $member) {
+          if (count($member) == 1) {
+              $result .= $member[0][0];
+          } else {
+              $result .= $this->computeDynamicVariant($variants, $member);
+          }
       }
-    }
-    return $result;
+      return $result;
   }
 
   /**
@@ -504,16 +554,19 @@ class Service {
    * @param the current member
    * @return a fragment of the url
    */
-  protected function computeDynamicVariant($variants, $member) : string {
-    $key = $member[1];
-    if (!array_key_exists($key, $variants))
-      throw new E\InvalidPathMember($key.' is missing');
-    $variant  = $variants[$key];
-    $type     = $member[0][1];
-    $callback = T\getCheckerFunction($type, $this->method);
-    if (!$callback($variant))
-      throw new E\InvalidPathMember($key.' has a bad type');
-    return (string) $variant;
+  protected function computeDynamicVariant($variants, $member) : string
+  {
+      $key = $member[1];
+      if (!array_key_exists($key, $variants)) {
+          throw new E\InvalidPathMember($key.' is missing');
+      }
+      $variant  = $variants[$key];
+      $type     = $member[0][1];
+      $callback = T\getCheckerFunction($type, $this->method);
+      if (!$callback($variant)) {
+          throw new E\InvalidPathMember($key.' has a bad type');
+      }
+      return (string) $variant;
   }
 
   /**
@@ -521,95 +574,106 @@ class Service {
    * @param array of get values
    * @return http parameters as a string
    */
-  protected function computeLinkGet($get) : string {
-    $flag = $this->validRawParameters($this->getParameters(), $get);
-    if (!$flag) throw new E\InvalidParameter('parameters are invalid');
-    if (count($get) == 0) return '';
-    $result = [];
-    foreach($get as $name => $value) {
-      $result[] = $name . '=' . $value;
-    }
-    return '?' . join('&', $result);
+  protected function computeLinkGet($get) : string
+  {
+      $flag = $this->validRawParameters($this->getParameters(), $get);
+      if (!$flag) {
+          throw new E\InvalidParameter('parameters are invalid');
+      }
+      if (count($get) == 0) {
+          return '';
+      }
+      $result = [];
+      foreach ($get as $name => $value) {
+          $result[] = $name . '=' . $value;
+      }
+      return '?' . join('&', $result);
   }
 
   /**
   * Store the service into the services list
   */
-  protected function store() {
-    Service::$services[$this->uid] = $this;
+  protected function store()
+  {
+      Service::$services[$this->uid] = $this;
   }
 
   // Static content
   protected static $services  = [];
-  public static $environement = null;
+    public static $environement = null;
 
   /**
   * Compute the current URL
   * @return a string corresponding of the current URL
   */
-  protected static function retreivePath() : string {
-    $base = pathinfo($_SERVER['SCRIPT_NAME'])['dirname'];
-    $r = explode('?', $_SERVER['REQUEST_URI']);
-    return substr($r[0], strlen($base)+1);
+  protected static function retreivePath() : string
+  {
+      $base = pathinfo($_SERVER['SCRIPT_NAME'])['dirname'];
+      $r = explode('?', $_SERVER['REQUEST_URI']);
+      return substr($r[0], strlen($base)+1);
   }
 
   /**
   * Compute all globals variables for a method
   * @return Returns a hashmap with static data
   */
-  public static function computeGlobals() {
-    if (Service::$environement === null) {
-      $method = strtolower(trim($_SERVER['REQUEST_METHOD']));
-      $global = [];
-      $global['get']  = $_GET;
-      $global['post'] = $_POST;
-      parse_str(file_get_contents('php://input'), $input);
-      $global['input'] = $input;
-      Service::$environement = array(
+  public static function computeGlobals()
+  {
+      if (Service::$environement === null) {
+          $method = strtolower(trim($_SERVER['REQUEST_METHOD']));
+          $global = [];
+          $global['get']  = $_GET;
+          $global['post'] = $_POST;
+          parse_str(file_get_contents('php://input'), $input);
+          $global['input'] = $input;
+          Service::$environement = array(
         'globals' => $global,
         'method'  => $method,
         'uri'     => self::retreivePath()
       );
-    }
-    return Service::$environement;
+      }
+      return Service::$environement;
   }
 
   /**
   * Returns the current Service (according Uri and parameters)
   * @return the current service
   */
-  public static function getCurrent() : Service {
-    Service::computeGlobals();
-    foreach(Service::$services as $service) {
-      if ($service->isBootable()) {
-        return $service;
+  public static function getCurrent() : Service
+  {
+      Service::computeGlobals();
+      foreach (Service::$services as $service) {
+          if ($service->isBootable()) {
+              return $service;
+          }
       }
-    }
-    $message = 'No services are founded for this uri';
-    throw new E\NoServicesCandidates($message);
+      $message = 'No services are founded for this uri';
+      throw new E\NoServicesCandidates($message);
   }
-
 }
 
 /**
 * Specification for GET services
 */
-class GETService extends Service {
-  /**
+class GETService extends Service
+{
+    /**
   * Constructor of service
   * @param string method
   * @param string path
   * @return Instance of service (and record it)
   */
-  public function __construct(string $path) {
-    parent::__construct('get', $path);
+  public function __construct(string $path)
+  {
+      parent::__construct('get', $path);
   }
   /**
   * Returns the global key for accessing super-global
   * @return string
   */
-  protected function paramKey() : string {
-    return 'get';
+  protected function paramKey() : string
+  {
+      return 'get';
   }
   /**
   * Add a required extra - parameter
@@ -617,53 +681,60 @@ class GETService extends Service {
   * @param type of the Parameter
   * @return the instance (for chaining)
   */
-  public function withGET(string $name, $type = T\free) {
-    $message = 'GET service could not has extra-parameters';
-    throw new E\InvalidParameter($message);
+  public function withGET(string $name, $type = T\free)
+  {
+      $message = 'GET service could not has extra-parameters';
+      throw new E\InvalidParameter($message);
   }
   /**
   * Check extra parameters
   * @param the global arguments
   * @return bool
   */
-  protected function validExtraParameters($arg) : bool {
-    return true;
+  protected function validExtraParameters($arg) : bool
+  {
+      return true;
   }
   /**
    * Get the extra parameter values by his key
    * @param the parameter 's name
    * @return a typed value
    */
-  public function get($key) {
-    return $this->param($key);
+  public function get($key)
+  {
+      return $this->param($key);
   }
 
   /**
    * Return all get Parameters
    */
-  protected function getParameters() {
-    return $this->parameters;
+  protected function getParameters()
+  {
+      return $this->parameters;
   }
 }
 
 /**
 * Specification for POST services
 */
-class POSTService extends Service {
-  /**
+class POSTService extends Service
+{
+    /**
   * Constructor of service
   * @param string method
   * @param string path
   * @return Instance of service (and record it)
   */
-  public function __construct(string $path) {
-    parent::__construct('post', $path);
+  public function __construct(string $path)
+  {
+      parent::__construct('post', $path);
   }
   /**
   * Returns the global key for accessing super-global
   * @return string
   */
-  protected function paramKey() : string {
-    return 'post';
+  protected function paramKey() : string
+  {
+      return 'post';
   }
 }
