@@ -50,6 +50,7 @@ class Service
     protected $view;
     protected $controller;
     protected $reflex_controller;
+    protected $fallbacks;
     protected $reflex_view;
     protected $booted;
     protected $http_code;
@@ -73,6 +74,7 @@ class Service
       $this->method = strtolower(trim($method));
       $this->parameters = [];
       $this->extra_parameters = [];
+      $this->fallbacks = [];
       $this->strict = true;
       $this->pathBuilder($path);
     // Store the service
@@ -167,6 +169,7 @@ class Service
       $this->http_code = $code;
       return $this;
   }
+
 
   /**
   * Add a required parameter
